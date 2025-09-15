@@ -61,31 +61,34 @@ KeepSAPappActive是一个Cloudflare Worker脚本，可以定期检查并确保SA
 
 ### 环境变量配置示例
 
+环境变量名称就是`APPS`这个，它对应的值示例如下：
+
 ```json
-{
-  "APPS": [
-    {
-      "APP_ID": "app1",
-      "CF_API": "https://your-cf-api-url",
-      "UAA_URL": "https://your-uaa-url",
-      "CF_USERNAME": "your-username",
-      "CF_PASSWORD": "your-password",
-      "APP_GUID": "your-app-guid"
-    },
-    {
-      "APP_ID": "app2",
-      "CF_API": "https://your-cf-api-url",
-      "UAA_URL": "https://your-uaa-url",
-      "CF_USERNAME": "your-username",
-      "CF_PASSWORD": "your-password",
-      "APP_NAME": "my-sap-app-1",
-      "ORG_NAME": "my-org",
-      "SPACE_NAME": "dev",
-      "APP_PING_URL": "https://your-app-url/ping"
-    }
-  ]
-}
+[
+  {
+    "APP_ID": "app1",
+    "CF_API": "https://your-cf-api-url",
+    "UAA_URL": "https://your-uaa-url",
+    "CF_USERNAME": "your-username",
+    "CF_PASSWORD": "your-password",
+    "APP_GUID": "your-app-guid"
+  },
+  {
+    "APP_ID": "app2",
+    "CF_API": "https://your-cf-api-url",
+    "UAA_URL": "https://your-uaa-url",
+    "CF_USERNAME": "your-username",
+    "CF_PASSWORD": "your-password",
+    "APP_NAME": "my-sap-app-1",
+    "ORG_NAME": "my-org",
+    "SPACE_NAME": "dev",
+    "APP_PING_URL": "https://your-app-url/ping"
+  }
+]
 ```
+
+上面这个示例中，`app1`和`app2`是两个应用，它们分别通过`第一种方式（GUID）`和`第二种方式（APP_NAME,ORG_NAME,SPACE_NAME）`进行配置。`app1`没有提供`APP_PING_URL`，因此它将不会进行健康检查。
+> **【推荐】**：你可以只用app1这样的格式，app2也可以像app1这样写。这样就不需要配置`APP_NAME`、`ORG_NAME`和`SPACE_NAME`了。
 
 ## API接口
 
