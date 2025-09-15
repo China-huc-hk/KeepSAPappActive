@@ -1,0 +1,112 @@
+# KeepSAPappActive
+
+一个基于Cloudflare Worker的解决方案，用于自动保持多个SAP Cloud Foundry应用程序处于活跃状态。
+
+## 项目简介
+
+KeepSAPappActive是一个Cloudflare Worker脚本，可以定期检查并确保SAP Cloud Foundry应用程序处于运行状态。它特别适用于防止开发/测试环境中的应用因长时间不活动而被自动休眠。
+
+本项目基于[uncleluogithub的Cloudflare SAP APP KeepaLive脚本](https://gist.github.com/uncleluogithub/083775a84afbff11f1057695ce29fddb)进行了修改，支持多SAP账户多应用拉起。
+
+## 主要特性
+
+- 支持监控和管理多个SAP应用程序，提高效率
+- 自动在指定时间段内每2分钟检查应用状态
+- 提供REST API接口用于手动控制和监控应用
+- 使用KV存储防止重复启动操作
+- 支持应用启动后的健康检查ping（AI改的，我也整不明白）
+
+## 部署指南
+
+### 前提条件
+
+1. Cloudflare账户
+2. SAP Cloud Foundry账户和API访问权限
+
+### 部署步骤
+
+1. 在Cloudflare Dashboard中创建一个新的Worker
+2. 将`multi_sap_app_worker.js`的内容复制到Worker编辑器中
+3. 创建一个KV命名空间，命名为`START_LOCK`
+4. 在Worker设置中绑定KV命名空间
+5. 配置环境变量`APPS`为JSON数组，包含所有需要监控的应用信息
+6. 设置Cron触发器：
+   - 在Worker的"触发器"选项卡中，添加Cron触发器
+   - 例如设置每天23点、0点、1点每2分钟执行一次：`*/2 23,0,1 * * *` （完美适配当前脚本）
+   - 例如设置为每分钟执行一次：`* * * * *`
+   - 例如设置为每2分钟执行一次：`*/2 * * * *`
+
+### 环境变量配置说明
+
+`APPS` 环境变量是一个JSON数组，包含所有需要监控的应用信息。每个应用配置包含以下字段：
+
+#### 必选字段
+- `CF_API`: Cloud Foundry API端点URL，例如 `https://your-cf-api-url`
+- `UAA_URL`: UAA认证服务URL，例如 `https://your-uaa-url`
+- `CF_USERNAME`: SAP用户名
+- `CF_PASSWORD`: SAP密码
+
+#### 应用标识（以下两种方式二选一）
+1. 直接通过GUID标识（[Uncle LUO演示视频中采取的方式](https://youtu.be/w-j8yPE2fKg?t=188)）：
+   - `APP_GUID`: 应用的GUID（如果提供此字段，则无需提供APP_NAME、ORG_NAME和SPACE_NAME）
+
+2. 通过名称、组织和空间标识：
+   - `APP_NAME`: 应用名称
+   - `ORG_NAME`: 组织名称
+   - `SPACE_NAME`: 空间名称
+
+#### 可选字段
+- `APP_ID`: **推荐提供**，应用的唯一标识符，用于API调用和日志（如不提供，将使用索引号）
+- `APP_PING_URL`: 应用启动后的健康检查URL，用于验证应用是否正常响应
+
+### 环境变量配置示例
+
+```json
+{
+  "APPS": [
+    {
+      "APP_ID": "app1",
+      "CF_API": "https://your-cf-api-url",
+      "UAA_URL": "https://your-uaa-url",
+      "CF_USERNAME": "your-username",
+      "CF_PASSWORD": "your-password",
+      "APP_GUID": "your-app-guid"
+    },
+    {
+      "APP_ID": "app2",
+      "CF_API": "https://your-cf-api-url",
+      "UAA_URL": "https://your-uaa-url",
+      "CF_USERNAME": "your-username",
+      "CF_PASSWORD": "your-password",
+      "APP_NAME": "my-sap-app-1",
+      "ORG_NAME": "my-org",
+      "SPACE_NAME": "dev",
+      "APP_PING_URL": "https://your-app-url/ping"
+    }
+  ]
+}
+```
+
+## API接口
+
+Worker提供以下HTTP接口：
+
+- **GET /** - 基本健康检查
+- **GET /apps** - 列出所有配置的应用
+- **GET /state?appId=app1** - 获取指定应用的状态
+- **GET /start?appId=app1&force=1** - 启动指定应用（force=1可忽略锁定）
+- **GET /stop?appId=app1** - 停止指定应用
+- **GET /unlock?appId=app1** - 解除指定应用的启动锁定
+- **GET /diag?appId=app1** - 获取应用配置的诊断信息
+
+## 许可证
+
+MIT
+
+## 作者
+
+[hcllmsx](https://github.com/hcllmsx/KeepSAPappActive)
+
+## 致谢
+
+本项目基于[uncleluogithub](https://gist.github.com/uncleluogithub/083775a84afbff11f1057695ce29fddb)的原始脚本进行了改进。
