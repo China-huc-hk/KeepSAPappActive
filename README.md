@@ -90,17 +90,21 @@ KeepSAPappActive是一个Cloudflare Worker脚本，可以定期检查并确保SA
 上面这个示例中，`app1`和`app2`是两个应用，它们分别通过`第一种方式（GUID）`和`第二种方式（APP_NAME,ORG_NAME,SPACE_NAME）`进行配置。`app1`没有提供`APP_PING_URL`，因此它将不会进行健康检查。
 > **【推荐】**：你可以只用app1这样的格式，app2也可以像app1这样写。这样就不需要配置`APP_NAME`、`ORG_NAME`和`SPACE_NAME`了。
 
-## API接口
+## 手动拉起应用
+
+由于workers自带域名被阻断了，可能无法直接访问，推荐给workers绑定一个自定义域名，然后通过自定义域名访问。
 
 Worker提供以下HTTP接口：
 
-- **GET /** - 基本健康检查
-- **GET /apps** - 列出所有配置的应用
-- **GET /state?appId=app1** - 获取指定应用的状态
-- **GET /start?appId=app1&force=1** - 启动指定应用（force=1可忽略锁定）
-- **GET /stop?appId=app1** - 停止指定应用
-- **GET /unlock?appId=app1** - 解除指定应用的启动锁定
-- **GET /diag?appId=app1** - 获取应用配置的诊断信息
+- `你的workers域名/` - 基本健康检查
+- `你的workers域名/apps` - 列出所有配置的应用
+- `你的workers域名/state?appId=app1` - 获取指定应用的状态
+- `你的workers域名/start?appId=app1&force=1` - 启动指定应用（force=1可忽略锁定）
+- `你的workers域名/stop?appId=app1` - 停止指定应用
+- `你的workers域名/unlock?appId=app1` - 解除指定应用的启动锁定
+- `你的workers域名/diag?appId=app1` - 获取应用配置的诊断信息
+
+例如访问`https://your-worker-url/state?appId=app1`，如果应用处于停止状态，将会返回`{"status":"stopped"}`，如果应用处于运行状态，将会返回`{"status":"running"}`。
 
 ## 许可证
 
