@@ -26,7 +26,7 @@ KeepSAPappActive是一个Cloudflare Worker脚本，可以定期检查并确保SA
 ### 部署步骤
 
 1. 在Cloudflare Dashboard中创建一个新的Worker
-2. 将`multi_sap_app_worker.js`的内容复制到Worker编辑器中
+2. 将`_worker.js`的内容复制到Worker编辑器中
 3. 创建一个KV命名空间，命名为`START_LOCK`
 4. 在Worker设置中绑定KV命名空间
 5. 配置环境变量`APPS`为JSON数组，包含所有需要监控的应用信息
