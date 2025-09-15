@@ -1,3 +1,5 @@
+//请使用这个脚本
+
 const pad = n => String(n).padStart(2, "0");
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const json = (o, c = 200) => new Response(JSON.stringify(o), { status: c, headers: { "content-type": "application/json" } });
