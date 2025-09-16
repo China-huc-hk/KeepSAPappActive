@@ -1,27 +1,12 @@
-# KeepSAPappActive
+## KeepSAPappActive项目简介
 
-一个基于Cloudflare Worker的解决方案，用于自动保持多个SAP Cloud Foundry应用程序处于活跃状态。
+KeepSAPappActive是一个Cloudflare Worker脚本，可以定期检查并确保SAP Cloud Foundry应用程序处于运行状态。
 
-## 项目简介
-
-KeepSAPappActive是一个Cloudflare Worker脚本，可以定期检查并确保SAP Cloud Foundry应用程序处于运行状态。它特别适用于防止开发/测试环境中的应用因长时间不活动而被自动休眠。
-
-本项目基于[uncleluogithub的Cloudflare SAP APP KeepaLive脚本](https://gist.github.com/uncleluogithub/083775a84afbff11f1057695ce29fddb)进行了修改，支持多SAP账户多应用拉起。
-
-## 主要特性
-
-- 支持监控和管理多个SAP应用程序，提高效率
-- 自动在指定时间段内每2分钟检查应用状态
-- 提供REST API接口用于手动控制和监控应用
-- 使用KV存储防止重复启动操作
-- 支持应用启动后的健康检查ping（AI改的，我也整不明白）
+本项目基于[uncleluogithub的Cloudflare SAP APP KeepaLive脚本](https://gist.github.com/uncleluogithub/083775a84afbff11f1057695ce29fddb)进行了修改，`支持多SAP账户多应用`拉起保活。
 
 ## 部署指南
 
-### 前提条件
-
-1. Cloudflare账户
-2. SAP Cloud Foundry账户和API访问权限
+可参照这个视频[Uncle LUO演示视频中采取的方式](https://youtu.be/w-j8yPE2fKg?t=188)
 
 ### 部署步骤
 
@@ -47,7 +32,7 @@ KeepSAPappActive是一个Cloudflare Worker脚本，可以定期检查并确保SA
 - `CF_PASSWORD`: SAP密码
 
 #### 应用标识（以下两种方式二选一）
-1. 直接通过GUID标识（[Uncle LUO演示视频中采取的方式](https://youtu.be/w-j8yPE2fKg?t=188)）：
+1. 直接通过GUID标识（）：
    - `APP_GUID`: 应用的GUID（如果提供此字段，则无需提供APP_NAME、ORG_NAME和SPACE_NAME）
 
 2. 通过名称、组织和空间标识：
@@ -57,7 +42,7 @@ KeepSAPappActive是一个Cloudflare Worker脚本，可以定期检查并确保SA
 
 #### 可选字段
 - `APP_ID`: **推荐提供**，应用的唯一标识符，用于API调用和日志（如不提供，将使用索引号）
-- `APP_PING_URL`: 应用启动后的健康检查URL，用于验证应用是否正常响应
+- `APP_PING_URL`: 应用启动后的健康检查URL，用于验证应用是否正常响应（AI修改的，我也不知道作用）
 
 ### 环境变量配置示例
 
@@ -91,6 +76,8 @@ KeepSAPappActive是一个Cloudflare Worker脚本，可以定期检查并确保SA
 > **【推荐】**：你可以只用app1这样的格式，app2也可以像app1这样写。这样就不需要配置`APP_NAME`、`ORG_NAME`和`SPACE_NAME`了。
 
 ### 使用保活配置生成器
+
+![保活配置生成器界面](./保活配置生成器/cover-保活配置生成器-v1.0.0.0.png)
 
 你可以下载项目中这个`保活配置生成器.exe`（这是一个ps1脚本，只在本地运行，无联网功能），它协助你生成APPS环境变量配置。会在程序同目录下生成一个txt文件，复制里面的内容到环境变量配置中即可。
 
