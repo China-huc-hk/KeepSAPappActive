@@ -32,7 +32,7 @@ KeepSAPappActive是一个Cloudflare Worker脚本，可以定期检查并确保SA
 - `CF_PASSWORD`: SAP密码
 
 #### 应用标识（以下两种方式二选一）
-1. 直接通过GUID标识（）：
+1. 【推荐】直接通过GUID标识：
    - `APP_GUID`: 应用的GUID（如果提供此字段，则无需提供APP_NAME、ORG_NAME和SPACE_NAME）
 
 2. 通过名称、组织和空间标识：
