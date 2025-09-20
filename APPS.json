@@ -1,0 +1,20 @@
+[
+  {
+    "APP_ID": "app1",
+    "APP_NAME":"my-sap-app-1",
+    "CF_API": "https://your-cf-api-url",
+    "UAA_URL": "https://your-uaa-url",
+    "CF_USERNAME": "your-username",
+    "CF_PASSWORD": "your-password",
+    "APP_GUID": "your-app-guid"
+  },
+  {
+    "APP_ID": "app2",
+    "APP_NAME":"my-sap-app-2",
+    "CF_API": "https://your-cf-api-url",
+    "UAA_URL": "https://your-uaa-url",
+    "CF_USERNAME": "your-username",
+    "CF_PASSWORD": "your-password",
+    "APP_GUID": "your-app-guid"
+  }
+]
