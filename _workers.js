@@ -1177,14 +1177,18 @@ export default {
             
             async loadStartLogs(appId) {
                 try {
-                    const response = await this.fetchWithAuth(\`\${this.baseUrl}/start-logs?appId=\${encodeURIComponent(appId)}&limit=7\`);
+                    const response = await this.fetchWithAuth(\`\${this.baseUrl}/start-logs?appId=\${encodeURIComponent(appId)}&limit=100\`);
                     const data = await response.json();
                     
                     const logsContainer = document.getElementById(\`logs-\${appId}\`)?.querySelector('.logs-content');
                     if (!logsContainer) return;
                     
                     if (data.ok && data.logs.length > 0) {
-                        logsContainer.innerHTML = data.logs.map((log, index) => {
+                        // 只显示最近3条记录
+                        const recentLogs = data.logs.slice(0, 3);
+                        const hasMore = data.logs.length > 3;
+                        
+                        logsContainer.innerHTML = recentLogs.map((log, index) => {
                             const date = new Date(log);
                             const now = new Date();
                             const isToday = date.toDateString() === now.toDateString();
@@ -1201,6 +1205,25 @@ export default {
                             
                             return \`<div class="log-entry">\${timeText}</div>\`;
                         }).join('');
+                        
+                        // 添加查看更多按钮
+                        if (hasMore) {
+                            const viewMoreBtn = document.createElement('a');
+                            viewMoreBtn.textContent = \`⇣ 展开 ⇣ (\${data.logs.length - 3} 条)\`;
+                            viewMoreBtn.style.cssText = 'color: #007bff; text-decoration: underline; cursor: pointer; font-size: 0.8em; margin-top: 8px; display: inline-block;';
+                            viewMoreBtn.onclick = () => this.showAllLogs(appId, data.logs);
+                            
+                            // 移除旧的查看更多按钮（如果存在）
+                            const oldBtn = logsContainer.querySelector('.view-more-btn');
+                            if (oldBtn) oldBtn.remove();
+                            
+                            viewMoreBtn.className = 'view-more-btn';
+                            logsContainer.appendChild(viewMoreBtn);
+                        } else {
+                            // 如果没有更多记录，移除查看更多按钮
+                            const oldBtn = logsContainer.querySelector('.view-more-btn');
+                            if (oldBtn) oldBtn.remove();
+                        }
                     } else {
                         logsContainer.innerHTML = '<div class="log-entry">暂无记录</div>';
                     }
@@ -1211,6 +1234,37 @@ export default {
                         logsContainer.innerHTML = '<div class="log-entry">加载失败</div>';
                     }
                 }
+            }
+            
+            showAllLogs(appId, allLogs) {
+                const logsContainer = document.getElementById(\`logs-\${appId}\`)?.querySelector('.logs-content');
+                if (!logsContainer) return;
+                
+                logsContainer.innerHTML = allLogs.map((log, index) => {
+                    const date = new Date(log);
+                    const now = new Date();
+                    const isToday = date.toDateString() === now.toDateString();
+                    const isYesterday = new Date(now.setDate(now.getDate() - 1)).toDateString() === date.toDateString();
+                    
+                    let timeText;
+                    if (isToday) {
+                        timeText = \`今天 \${date.toLocaleTimeString('zh-CN')}\`;
+                    } else if (isYesterday) {
+                        timeText = \`昨天 \${date.toLocaleTimeString('zh-CN')}\`;
+                    } else {
+                        timeText = \`\${date.getMonth() + 1}月\${date.getDate()}日 \${date.toLocaleTimeString('zh-CN')}\`;
+                    }
+                    
+                    return \`<div class="log-entry">\${timeText}</div>\`;
+                }).join('');
+                
+                // 添加收起按钮
+                const backBtn = document.createElement('a');
+                backBtn.textContent = '⇡ 收起 ⇡';
+                backBtn.style.cssText = 'color: #007bff; text-decoration: underline; cursor: pointer; font-size: 0.8em; margin-top: 8px; display: inline-block;';
+                backBtn.onclick = () => this.loadStartLogs(appId);
+                backBtn.className = 'view-more-btn';
+                logsContainer.appendChild(backBtn);
             }
             
             startAutoRefresh() {
